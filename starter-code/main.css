@@ -623,8 +623,8 @@ button {
 
 .quiz__option:has(.correct-answer.quiz__option-radio-input:checked) {
   border-color: var(--color-select-success);
-  background: url("./assets/images/icon-correct.svg") no-repeat
-    calc(100% - 11px) center;
+  background: var(--color-select-bg) url("./assets/images/icon-correct.svg")
+    no-repeat calc(100% - 11px) center;
   background-size: 32px 32px;
   @media (width > calc(700 / 16 * 1rem)) {
     background-size: 40px 40px;
@@ -637,8 +637,8 @@ button {
 
 .quiz__option:has(.incorrect-answer.quiz__option-radio-input:checked) {
   border-color: var(--color-select-failure);
-  background: url("./assets/images/icon-incorrect.svg") no-repeat
-    calc(100% - 11px) center;
+  background: var(--color-select-bg) url("./assets/images/icon-incorrect.svg")
+    no-repeat calc(100% - 11px) center;
   background-size: 32px 32px;
 
   @media (width > calc(700 / 16 * 1rem)) {
