@@ -21,6 +21,8 @@ const quizResultScoreP = document.querySelector(
   ".quiz-completed__result-score"
 );
 const quizPlayAgainBtn = document.querySelector(".quiz-completed__repaly-btn");
+const themes = document.querySelectorAll("input[name='theme']");
+const themeToggleBtn = document.querySelector(".header__toggle-button");
 const quizProgressBar = document.querySelector("#quizProgressBar");
 
 let isInSubmitMode = true;
@@ -292,6 +294,19 @@ quizPlayAgainBtn.addEventListener("click", resetQuiz);
 quizQuestionOptions.forEach((quizQuestionOption) => {
   quizQuestionOption.addEventListener("input", () => {
     hideSection(quizErrorMessageDiv);
+  });
+});
+
+themes.forEach((theme) => {
+  theme.addEventListener("change", () => {
+    const body = document.body;
+    body.style.transition = "";
+    body.className = "";
+    if (theme.id === "dark") {
+      body.className = "dark";
+    } else {
+      body.className = "light";
+    }
   });
 });
 

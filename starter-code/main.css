@@ -177,6 +177,8 @@ body {
   font-size: var(--fs-18);
   line-height: var(--lh-18);
   padding-block-end: 87px;
+  transition: 500ms ease-in-out;
+  transition-property: color background;
   @media (width > calc(700 / 16 * 1rem)) {
     font-size: var(--fs-28);
     line-height: var(--lh-28);
