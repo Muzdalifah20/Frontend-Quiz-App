@@ -157,17 +157,24 @@ function getQuizDataAnswerIndex() {
 }
 
 let quizScore = 0;
-function evaluateSubmitAnswer() {
+
+function evaluateOptions() {
   const isOneQuizOptionSelected = true;
   const selectedAnswer = getSelectedAnswer();
-  const quizDataAnswerIndex = getQuizDataAnswerIndex();
-  hideSection(quizErrorMessageDiv);
-
   if (selectedAnswer === null) {
     showSection(quizErrorMessageDiv);
     isOneQuizOptionSelected = false;
     return;
   }
+  return isOneQuizOptionSelected;
+}
+
+function evaluateSubmitAnswer() {
+  const selectedAnswer = getSelectedAnswer();
+  const quizDataAnswerIndex = getQuizDataAnswerIndex();
+  hideSection(quizErrorMessageDiv);
+
+  evaluateOptions();
 
   removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
   removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
@@ -185,8 +192,6 @@ function evaluateSubmitAnswer() {
     );
     showUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
   }
-
-  return isOneQuizOptionSelected;
 }
 
 function updateUiForNextQuestion() {
@@ -250,7 +255,7 @@ function handleQuizQuestionSubmitBtn() {
 quizQuestionBtn.addEventListener("click", (e) => {
   if (isInSubmitMode) {
     e.preventDefault();
-    const canContinue = evaluateSubmitAnswer();
+    const canContinue = evaluateOptions();
     console.log(canContinue);
     if (!canContinue) return;
     evaluateSubmitAnswer();
