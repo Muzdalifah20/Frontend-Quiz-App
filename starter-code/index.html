@@ -246,16 +246,11 @@
       </section>
       <section class="quiz">
         <div class="quiz__question">
-          <label for="quizProgressBar" class="quiz__question-label"
-            >Question 6 of 10</label
-          >
-          <h3 class="quiz__question-text" id="quizQuestionText">
-            Which of these color contrast ratios defines the minimum WCAG 2.1
-            Level AA requirement for normal text?
-          </h3>
+          <label for="quizProgressBar" class="quiz__question-label"> </label>
+          <h3 class="quiz__question-text" id="quizQuestionText"></h3>
           <progress
             max="10"
-            value="6"
+            value="0"
             id="quizProgressBar"
             class="quiz__progress-bar"
           >
@@ -292,9 +287,8 @@
                 />
               </svg>
 
-              <label class="quiz__option-label" for="optionA" id="quizOption1"
-                >4.5 : 1</label
-              >
+              <label class="quiz__option-label" for="optionA" id="quizOption1">
+              </label>
             </div>
             <div class="quiz__option">
               <input
@@ -325,9 +319,8 @@
                 />
               </svg>
 
-              <label class="quiz__option-label" for="optionB" id="quizOption2"
-                >3 : 1</label
-              >
+              <label class="quiz__option-label" for="optionB" id="quizOption2">
+              </label>
             </div>
             <div class="quiz__option">
               <input
@@ -358,9 +351,8 @@
                 />
               </svg>
 
-              <label class="quiz__option-label" for="optionC" id="quizOption3"
-                >2.5 : 1</label
-              >
+              <label class="quiz__option-label" for="optionC" id="quizOption3">
+              </label>
             </div>
             <div class="quiz__option">
               <input
@@ -391,9 +383,8 @@
                 />
               </svg>
 
-              <label class="quiz__option-label" for="optionD" id="quizOption4"
-                >5 : 1</label
-              >
+              <label class="quiz__option-label" for="optionD" id="quizOption4">
+              </label>
             </div>
           </div>
           <button type="button" class="quiz__submit-btn button">
@@ -418,8 +409,12 @@
         <div class="quiz-completed__content">
           <div class="quiz-completed__result">
             <div class="quiz-completed__result-header">
-              <img src="./assets/images/icon-accessibility.svg" alt="" />
-              <h3>Accessibility</h3>
+              <img
+                class="result-header__icon"
+                src="./assets/images/icon-accessibility.svg"
+                alt=""
+              />
+              <h3 class="result-header__title">Accessibility</h3>
             </div>
             <p class="quiz-completed__result-score">8</p>
             <p class="quiz-completed__result-rate">out of 10</p>

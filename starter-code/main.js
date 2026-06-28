@@ -15,7 +15,16 @@ const quizErrorMessageDiv = document.querySelector(".quiz__error-message");
 
 const quizQuestion = document.querySelector("#quizQuestion");
 const quizQuestionOptionsDiv = document.querySelectorAll(".quiz__option");
+const quizResultHeaderTitle = document.querySelector(".result-header__title");
+const quizResultHeaderIcon = document.querySelector(".result-header__icon");
+const quizResultScoreP = document.querySelector(
+  ".quiz-completed__result-score"
+);
+const quizPlayAgainBtn = document.querySelector(".quiz-completed__repaly-btn");
+const quizProgressBar = document.querySelector("#quizProgressBar");
+
 let isInSubmitMode = true;
+
 // let quizQuestionIndex = 0;
 
 const fetchQuizData = async (quizSubject = "HTML", quizQuestionIndex) => {
@@ -29,12 +38,10 @@ const fetchQuizData = async (quizSubject = "HTML", quizQuestionIndex) => {
     }
 
     const quizData = await response.json();
-    updateQuestion(quizData, "HTML", quizQuestionIndex);
-    // evaluateSubmitAnswer(quizData, "HTML", quizQuestionIndex);
-    getQuizDataAnswer(quizData, "HTML", quizQuestionIndex);
-    // getQuizData(quizData, "HTML", 0, "answer");
-    // updateQuizHeader(quizData, quizSubject);
-    // console.log(quizData);
+    updateQuestion(quizData, quizSubject, quizQuestionIndex);
+    updateQuizHeader(quizData, quizSubject);
+    getQuizDataAnswer(quizData, quizSubject, quizQuestionIndex);
+
     return quizData;
   } catch (error) {
     console.error(error.message);
@@ -53,7 +60,6 @@ function getQuizData(quizData, quizSubject, quizQuestionIndex = 0, quizQuery) {
 }
 
 function updateQuestion(quizData, quizSubject, quizQuestionIndex = 0) {
-  // for(let i = 0; i< 10; i++){
   const question = getQuizData(
     quizData,
     quizSubject,
@@ -73,9 +79,6 @@ function updateQuestion(quizData, quizSubject, quizQuestionIndex = 0) {
     quizQuestionOptions[j].value = options[j];
     quizQuestionOptionsLabel[j].textContent = options[j];
   }
-
-  // }
-  //   console.log(question, options, answer);
 }
 
 let quizDataAnswer;
@@ -86,7 +89,6 @@ function getQuizDataAnswer(quizData, quizSubject, quizQuestionIndex) {
     quizQuestionIndex,
     "answer"
   );
-  console.log(quizDataAnswer);
 }
 function quizSubjectIndex(quizSubject = 0) {
   switch (quizSubject) {
@@ -123,8 +125,11 @@ function updateQuizHeader(quizData, quizSubject) {
   const quizTitleIcon = document.querySelector("#quizTitleIcon");
   const quizTitle = document.querySelector("#quizTitle");
   if (!quizTitle || !quizTitleIcon) return;
+
   quizTitle.textContent = quizTitleText;
   quizTitleIcon.src = quizTitleIconPath;
+  quizResultHeaderTitle.textContent = quizTitleText;
+  quizResultHeaderIcon.src = quizTitleIconPath;
 }
 
 function getSelectedAnswer() {
@@ -151,15 +156,20 @@ function getQuizDataAnswerIndex() {
 
 let quizScore = 0;
 function evaluateSubmitAnswer() {
+  const isOneQuizOptionSelected = true;
   const selectedAnswer = getSelectedAnswer();
   const quizDataAnswerIndex = getQuizDataAnswerIndex();
   hideSection(quizErrorMessageDiv);
-  removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
-  removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
+
   if (selectedAnswer === null) {
     showSection(quizErrorMessageDiv);
+    isOneQuizOptionSelected = false;
     return;
   }
+
+  removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
+  removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
+  hideSection(quizErrorMessageDiv);
 
   if (selectedAnswer.value === quizDataAnswer) {
     showUpdatedAnswerStyle(selectedAnswer, "correct-answer");
@@ -174,19 +184,29 @@ function evaluateSubmitAnswer() {
     showUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
   }
 
-  return selectedAnswer == quizDataAnswer;
+  return isOneQuizOptionSelected;
 }
 
 function updateUiForNextQuestion() {
   const selectedAnswer = getSelectedAnswer();
   const quizDataAnswerIndex = getQuizDataAnswerIndex();
-  removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
-  removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
-  removeUpdatedAnswerStyle(
-    quizQuestionOptionsDiv[quizDataAnswerIndex],
-    "given-quiz-answer"
-  );
-  selectedAnswer.checked = false;
+  if (selectedAnswer !== null) {
+    removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
+    removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
+    removeUpdatedAnswerStyle(
+      quizQuestionOptionsDiv[quizDataAnswerIndex],
+      "given-quiz-answer"
+    );
+    selectedAnswer.checked = false;
+  }
+}
+
+function updateQuizScore() {
+  quizResultScoreP.textContent = quizScore;
+  hideSection(heroSection);
+  hideSection(quizSection);
+  showSection(headerTitleDiv);
+  showSection(quizCompletedSection);
 }
 
 function showUpdatedAnswerStyle(element, className) {
@@ -197,25 +217,29 @@ function removeUpdatedAnswerStyle(element, className) {
   element.classList.remove(className);
 }
 
+function handleQuizProgressBarValue() {
+  quizProgressBar.value = `${quizQuestionIndex + 1}`;
+}
+
 let quizQuestionIndex = 0;
 let currentQuizSubject = "HTML";
 quizSubjectBtns.forEach((quizSubjectBtn) => {
   quizSubjectBtn.addEventListener("click", () => {
     const quizSubject = quizSubjectBtn.dataset.subject;
     currentQuizSubject = quizSubject;
-    quizSubjectIndex = 0;
 
     hideSection(heroSection);
     hideSection(quizCompletedSection);
     showSection(headerTitleDiv);
     showSection(quizSection);
 
-    fetchQuizData(currentQuizSubject, quizSubjectIndex + 1);
+    fetchQuizData(currentQuizSubject, quizQuestionIndex);
     quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 1} of 10`;
   });
 });
 
 function handleQuizQuestionSubmitBtn() {
+  if (quizQuestionIndex >= 10) return;
   fetchQuizData(currentQuizSubject, quizQuestionIndex + 1);
   quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 2} of 10`;
   quizQuestionIndex++;
@@ -224,8 +248,16 @@ function handleQuizQuestionSubmitBtn() {
 quizQuestionBtn.addEventListener("click", (e) => {
   if (isInSubmitMode) {
     e.preventDefault();
-    console.log(evaluateSubmitAnswer());
-    quizQuestionBtn.textContent = "Next Question";
+    const canContinue = evaluateSubmitAnswer();
+    console.log(canContinue);
+    if (!canContinue) return;
+    evaluateSubmitAnswer();
+    handleQuizProgressBarValue();
+    if (quizQuestionIndex === 9) {
+      quizQuestionBtn.textContent = "Show Result";
+    } else {
+      quizQuestionBtn.textContent = "Next Question";
+    }
     isInSubmitMode = false;
   } else {
     quizQuestionBtn.textContent = "Submit Answer";
@@ -233,14 +265,39 @@ quizQuestionBtn.addEventListener("click", (e) => {
     updateUiForNextQuestion();
     handleQuizQuestionSubmitBtn();
     isInSubmitMode = true;
-    if (quizQuestionIndex > 10) {
+
+    if (quizQuestionIndex > 9) {
       isInSubmitMode = false;
-      return;
+      updateQuizScore();
     }
+
+    if (quizQuestionIndex >= 10) return;
   }
+});
+
+function resetQuiz() {
+  quizScore = 0;
+  quizQuestionIndex = 0;
+  resetSections();
+}
+
+function resetSections() {
+  hideSection(quizSection);
+  hideSection(quizCompletedSection);
+  showSection(heroSection);
+}
+
+quizPlayAgainBtn.addEventListener("click", resetQuiz);
+
+quizQuestionOptions.forEach((quizQuestionOption) => {
+  quizQuestionOption.addEventListener("input", () => {
+    hideSection(quizErrorMessageDiv);
+  });
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchQuizData(currentQuizSubject, quizQuestionIndex);
   quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 1} of 10`;
+  resetSections();
+  handleQuizProgressBarValue();
 });
