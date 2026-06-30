@@ -28,6 +28,7 @@ const body = document.body;
 // State
 let quizData = null;
 let quizDataAnswer = null;
+let quizQuestionsLength = 0;
 let quizQuestionIndex = 0;
 let quizScore = 0;
 let currentQuizSubject = "HTML";
@@ -123,6 +124,12 @@ function getQuizDataAnswer(quizSubject, quizQuestionIndex) {
   quizDataAnswer = getQuizData(quizSubject, quizQuestionIndex, "answer");
 }
 
+function getQuizQuestionsLength(quizSubject) {
+  const quizSubjectByIndex = quizSubjectIndex(quizSubject);
+  quizQuestionsLength =
+    quizData?.quizzes?.[quizSubjectByIndex]?.questions?.length;
+}
+
 // UI functions
 function hideSection(section) {
   section.classList.add("hidden");
@@ -134,6 +141,7 @@ function showSection(section) {
 function resetQuiz() {
   quizScore = 0;
   quizQuestionIndex = 0;
+  quizProgressBar.value = 0;
   resetSections();
 }
 
@@ -158,7 +166,9 @@ function removeUpdatedAnswerStyle(element, className) {
 }
 
 function handleQuizProgressBarValue() {
-  quizProgressBar.value = `${quizQuestionIndex + 1}`;
+  if (quizProgressBar) {
+    quizProgressBar.value = `${quizQuestionIndex + 1}`;
+  }
 }
 
 function focusFirstOption(currentBtn) {
@@ -264,16 +274,23 @@ quizSubjectBtns.forEach((quizSubjectBtn) => {
     renderHeader(currentQuizSubject);
     renderQuestion(currentQuizSubject, quizQuestionIndex);
     getQuizDataAnswer(currentQuizSubject, quizQuestionIndex);
-    quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 1} of 10`;
+    getQuizQuestionsLength(currentQuizSubject);
+    quizQuestionLabel.textContent = `Question ${
+      quizQuestionIndex + 1
+    } of ${quizQuestionsLength}`;
 
     focusFirstOption(quizSubjectBtn);
   });
 });
 
 function goTONextQuestion() {
-  if (quizQuestionIndex >= 10) return;
-  quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 2} of 10`;
   quizQuestionIndex++;
+  if (quizQuestionIndex >= quizQuestionsLength) return;
+  renderQuestion(currentQuizSubject, quizQuestionIndex);
+  getQuizDataAnswer(currentQuizSubject, quizQuestionIndex);
+  quizQuestionLabel.textContent = `Question ${
+    quizQuestionIndex + 1
+  } of ${quizQuestionsLength}`;
 }
 
 quizQuestionBtn.addEventListener("click", (e) => {
@@ -283,7 +300,7 @@ quizQuestionBtn.addEventListener("click", (e) => {
     if (!canContinue) return;
     evaluateSubmitAnswer();
     handleQuizProgressBarValue();
-    if (quizQuestionIndex === 9) {
+    if (quizQuestionIndex === `${quizQuestionsLength - 1}`) {
       quizQuestionBtn.textContent = "Show Result";
     } else {
       quizQuestionBtn.textContent = "Next Question";
@@ -297,12 +314,12 @@ quizQuestionBtn.addEventListener("click", (e) => {
     goTONextQuestion();
     isInSubmitMode = true;
 
-    if (quizQuestionIndex > 9) {
+    if (quizQuestionIndex > `${quizQuestionsLength - 1}`) {
       isInSubmitMode = false;
       finishQuiz();
     }
 
-    if (quizQuestionIndex >= 10) return;
+    if (quizQuestionIndex >= quizQuestionsLength) return;
   }
 });
 
@@ -328,7 +345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     initTheme();
     await loadQuizData();
-
+    getQuizQuestionsLength();
     resetSections();
   } catch (error) {
     console.error(error.message);

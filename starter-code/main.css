@@ -623,9 +623,6 @@ input:focus-visible,
   transition: color 200ms ease-in-out;
 }
 
-.quiz__option-label {
-}
-
 .quiz__option-icon-letter {
   color: var(--color-select-icon-letter);
 }

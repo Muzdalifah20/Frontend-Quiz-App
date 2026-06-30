@@ -16,14 +16,25 @@ A simple quiz app made with HTML, CSS, and JavaScript.
 - Theme saved in local storage.
 - Quiz data loaded from JSON.
 
+## Built with
+
+- HTML5
+- CSS
+- JavaScript
+- CSS Grid
+- Flexbox
+- localStorage
+- JSON data
+
 ## How to run
 
 1. Open the project folder.
 2. Open `index.html` in your browser.
 
-# Live Site
+## Links
 
-https://muzdalifah20.github.io/Frontend-Quiz-App/starter-code/
+- Frontend Mentor challenge: [Quiz App Challenge](https://www.frontendmentor.io/challenges/frontend-quiz-app-BE7xkzXQnU)
+- Live site: https://muzdalifah20.github.io/Frontend-Quiz-App/starter-code/
 
 ## Files
 
