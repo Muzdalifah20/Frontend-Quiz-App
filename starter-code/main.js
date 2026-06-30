@@ -1,3 +1,4 @@
+// DOM
 const quizSubjectBtns = document.querySelectorAll(".hero__subject-btn");
 const heroSection = document.querySelector(".hero");
 const headerTitleDiv = document.querySelector(".header__title");
@@ -9,10 +10,8 @@ const quizQuestionOptionsLabel = document.querySelectorAll(
   ".quiz__option-label"
 );
 const quizQuestionLabel = document.querySelector(".quiz__question-label");
-
 const quizQuestionBtn = document.querySelector(".quiz__submit-btn");
 const quizErrorMessageDiv = document.querySelector(".quiz__error-message");
-
 const quizQuestion = document.querySelector("#quizQuestion");
 const quizQuestionOptionsDiv = document.querySelectorAll(".quiz__option");
 const quizResultHeaderTitle = document.querySelector(".result-header__title");
@@ -24,12 +23,30 @@ const quizPlayAgainBtn = document.querySelector(".quiz-completed__repaly-btn");
 const themes = document.querySelectorAll("input[name='theme']");
 const themeToggleBtn = document.querySelector(".header__toggle-button");
 const quizProgressBar = document.querySelector("#quizProgressBar");
+const body = document.body;
 
+// State
+let quizData = null;
+let quizDataAnswer = null;
+let quizQuestionIndex = 0;
+let quizScore = 0;
+let currentQuizSubject = "HTML";
 let isInSubmitMode = true;
 
-// let quizQuestionIndex = 0;
+//  Theme Function
+function setTheme(theme) {
+  body.classList.toggle("dark", theme === "dark");
+  body.classList.toggle("light", theme === "light");
+  localStorage.setItem("theme", theme);
+}
 
-const fetchQuizData = async (quizSubject = "HTML", quizQuestionIndex) => {
+function initTheme() {
+  const savedTheme = localStorage.getItem("theme");
+  setTheme(savedTheme || "light");
+}
+
+// Load Quiz Data
+const loadQuizData = async () => {
   try {
     const response = await fetch("./assets/data/data.json");
 
@@ -39,59 +56,12 @@ const fetchQuizData = async (quizSubject = "HTML", quizQuestionIndex) => {
       );
     }
 
-    const quizData = await response.json();
-    updateQuestion(quizData, quizSubject, quizQuestionIndex);
-    updateQuizHeader(quizData, quizSubject);
-    getQuizDataAnswer(quizData, quizSubject, quizQuestionIndex);
-
-    return quizData;
+    quizData = await response.json();
   } catch (error) {
     console.error(error.message);
   }
 };
 
-function getQuizData(quizData, quizSubject, quizQuestionIndex = 0, quizQuery) {
-  const quizSubjectByIndex = quizSubjectIndex(quizSubject);
-
-  const QuizQueryData =
-    quizData?.quizzes?.[quizSubjectByIndex]?.questions?.[quizQuestionIndex]?.[
-      quizQuery
-    ];
-
-  return QuizQueryData;
-}
-
-function updateQuestion(quizData, quizSubject, quizQuestionIndex = 0) {
-  const question = getQuizData(
-    quizData,
-    quizSubject,
-    quizQuestionIndex,
-    "question"
-  );
-
-  const options = getQuizData(
-    quizData,
-    quizSubject,
-    quizQuestionIndex,
-    "options"
-  );
-
-  quizQuestionText.textContent = question;
-  for (let j = 0; j < 4; j++) {
-    quizQuestionOptions[j].value = options[j];
-    quizQuestionOptionsLabel[j].textContent = options[j];
-  }
-}
-
-let quizDataAnswer;
-function getQuizDataAnswer(quizData, quizSubject, quizQuestionIndex) {
-  quizDataAnswer = getQuizData(
-    quizData,
-    quizSubject,
-    quizQuestionIndex,
-    "answer"
-  );
-}
 function quizSubjectIndex(quizSubject = 0) {
   switch (quizSubject) {
     case "HTML":
@@ -113,14 +83,18 @@ function quizSubjectIndex(quizSubject = 0) {
   }
 }
 
-function hideSection(section) {
-  section.classList.add("hidden");
-}
-function showSection(section) {
-  section.classList.remove("hidden");
+function getQuizData(quizSubject, quizQuestionIndex = 0, quizQuery) {
+  const quizSubjectByIndex = quizSubjectIndex(quizSubject);
+  console.log(quizData);
+  const quizQueryData =
+    quizData?.quizzes?.[quizSubjectByIndex]?.questions?.[quizQuestionIndex]?.[
+      quizQuery
+    ];
+
+  return quizQueryData;
 }
 
-function updateQuizHeader(quizData, quizSubject) {
+function renderHeader(quizSubject) {
   const quizSubjectByIndex = quizSubjectIndex(quizSubject);
   const quizTitleText = quizData?.quizzes?.[quizSubjectByIndex]?.title;
   const quizTitleIconPath = quizData?.quizzes?.[quizSubjectByIndex]?.icon;
@@ -134,6 +108,70 @@ function updateQuizHeader(quizData, quizSubject) {
   quizResultHeaderIcon.src = quizTitleIconPath;
 }
 
+function renderQuestion(quizSubject, quizQuestionIndex = 0) {
+  const question = getQuizData(quizSubject, quizQuestionIndex, "question");
+
+  const options = getQuizData(quizSubject, quizQuestionIndex, "options");
+
+  quizQuestionText.textContent = question;
+  for (let j = 0; j < 4; j++) {
+    quizQuestionOptions[j].value = options[j];
+    quizQuestionOptionsLabel[j].textContent = options[j];
+  }
+}
+
+function getQuizDataAnswer(quizSubject, quizQuestionIndex) {
+  quizDataAnswer = getQuizData(quizSubject, quizQuestionIndex, "answer");
+}
+
+// UI functions
+function hideSection(section) {
+  section.classList.add("hidden");
+}
+function showSection(section) {
+  section.classList.remove("hidden");
+}
+
+function resetQuiz() {
+  quizScore = 0;
+  quizQuestionIndex = 0;
+  resetSections();
+}
+
+function resetSections() {
+  hideSection(headerTitleDiv);
+  hideSection(quizSection);
+  hideSection(quizCompletedSection);
+  showSection(heroSection);
+}
+
+function showError() {
+  showSection(quizErrorMessageDiv);
+  quizErrorMessageDiv.focus();
+}
+
+function showUpdatedAnswerStyle(element, className) {
+  element.classList.add(className);
+}
+
+function removeUpdatedAnswerStyle(element, className) {
+  element.classList.remove(className);
+}
+
+function handleQuizProgressBarValue() {
+  quizProgressBar.value = `${quizQuestionIndex + 1}`;
+}
+
+function focusFirstOption(currentBtn) {
+  const firstOption = document.getElementById("optionA");
+  if (firstOption) {
+    firstOption.focus();
+  } else {
+    currentBtn.focus();
+  }
+}
+
+// Helper functions
 function getSelectedAnswer() {
   let selectedAnswer;
   for (const quizQuestionOption of quizQuestionOptions) {
@@ -156,17 +194,14 @@ function getQuizDataAnswerIndex() {
   return quizDataAnswerIndex;
 }
 
-let quizScore = 0;
-
+// Logic Functions
 function evaluateOptions() {
-  const isOneQuizOptionSelected = true;
   const selectedAnswer = getSelectedAnswer();
-  if (selectedAnswer === null) {
-    showSection(quizErrorMessageDiv);
-    isOneQuizOptionSelected = false;
-    return;
+  if (!selectedAnswer) {
+    showError();
+    return false;
   }
-  return isOneQuizOptionSelected;
+  return true;
 }
 
 function evaluateSubmitAnswer() {
@@ -178,7 +213,6 @@ function evaluateSubmitAnswer() {
 
   removeUpdatedAnswerStyle(selectedAnswer, "correct-answer");
   removeUpdatedAnswerStyle(selectedAnswer, "incorrect-answer");
-  hideSection(quizErrorMessageDiv);
 
   if (selectedAnswer.value === quizDataAnswer) {
     showUpdatedAnswerStyle(selectedAnswer, "correct-answer");
@@ -208,7 +242,7 @@ function updateUiForNextQuestion() {
   }
 }
 
-function updateQuizScore() {
+function finishQuiz() {
   quizResultScoreP.textContent = quizScore;
   hideSection(heroSection);
   hideSection(quizSection);
@@ -216,38 +250,29 @@ function updateQuizScore() {
   showSection(quizCompletedSection);
 }
 
-function showUpdatedAnswerStyle(element, className) {
-  element.classList.add(className);
-}
-
-function removeUpdatedAnswerStyle(element, className) {
-  element.classList.remove(className);
-}
-
-function handleQuizProgressBarValue() {
-  quizProgressBar.value = `${quizQuestionIndex + 1}`;
-}
-
-let quizQuestionIndex = 0;
-let currentQuizSubject = "HTML";
 quizSubjectBtns.forEach((quizSubjectBtn) => {
   quizSubjectBtn.addEventListener("click", () => {
     const quizSubject = quizSubjectBtn.dataset.subject;
+
     currentQuizSubject = quizSubject;
+    quizQuestionIndex = 0;
 
     hideSection(heroSection);
     hideSection(quizCompletedSection);
     showSection(headerTitleDiv);
     showSection(quizSection);
 
-    fetchQuizData(currentQuizSubject, quizQuestionIndex);
+    renderHeader(currentQuizSubject);
+    renderQuestion(currentQuizSubject, quizQuestionIndex);
+    getQuizDataAnswer(currentQuizSubject, quizQuestionIndex);
     quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 1} of 10`;
+
+    focusFirstOption(quizSubjectBtn);
   });
 });
 
-function handleQuizQuestionSubmitBtn() {
+function goTONextQuestion() {
   if (quizQuestionIndex >= 10) return;
-  fetchQuizData(currentQuizSubject, quizQuestionIndex + 1);
   quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 2} of 10`;
   quizQuestionIndex++;
 }
@@ -267,32 +292,21 @@ quizQuestionBtn.addEventListener("click", (e) => {
     }
     isInSubmitMode = false;
   } else {
+    focusFirstOption(quizQuestionBtn);
     quizQuestionBtn.textContent = "Submit Answer";
     e.preventDefault();
     updateUiForNextQuestion();
-    handleQuizQuestionSubmitBtn();
+    goTONextQuestion();
     isInSubmitMode = true;
 
     if (quizQuestionIndex > 9) {
       isInSubmitMode = false;
-      updateQuizScore();
+      finishQuiz();
     }
 
     if (quizQuestionIndex >= 10) return;
   }
 });
-
-function resetQuiz() {
-  quizScore = 0;
-  quizQuestionIndex = 0;
-  resetSections();
-}
-
-function resetSections() {
-  hideSection(quizSection);
-  hideSection(quizCompletedSection);
-  showSection(heroSection);
-}
 
 quizPlayAgainBtn.addEventListener("click", resetQuiz);
 
@@ -304,20 +318,21 @@ quizQuestionOptions.forEach((quizQuestionOption) => {
 
 themes.forEach((theme) => {
   theme.addEventListener("change", () => {
-    const body = document.body;
-    body.style.transition = "";
-    body.className = "";
     if (theme.id === "dark") {
-      body.className = "dark";
+      setTheme("dark");
     } else {
-      body.className = "light";
+      setTheme("light");
     }
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  fetchQuizData(currentQuizSubject, quizQuestionIndex);
-  quizQuestionLabel.textContent = `Question ${quizQuestionIndex + 1} of 10`;
-  resetSections();
-  handleQuizProgressBarValue();
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    initTheme();
+    await loadQuizData();
+
+    resetSections();
+  } catch (error) {
+    console.error(error.message);
+  }
 });

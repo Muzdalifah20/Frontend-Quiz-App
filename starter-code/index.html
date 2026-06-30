@@ -16,7 +16,10 @@
     <script src="./main.js" defer></script>
   </head>
   <body>
-    <h1 class="visually-hidden" aria-hidden="true">Frontend Quiz!</h1>
+    <a href="#mainContent" class="visually-hidden skip-link"
+      >Skip to main content</a
+    >
+    <h1 class="visually-hidden">Frontend Quiz!</h1>
     <svg
       aria-hidden="true"
       class="background-pattren-ellipse-mobile"
@@ -118,7 +121,7 @@
         </fieldset>
       </div>
     </header>
-    <main class="main wrapper">
+    <main class="main wrapper" id="mainContent">
       <section class="hero hidden">
         <div class="hero__header">
           <h2 class="hero__title">
@@ -246,8 +249,14 @@
       </section>
       <section class="quiz">
         <div class="quiz__question">
-          <label for="quizProgressBar" class="quiz__question-label"> </label>
-          <h3 class="quiz__question-text" id="quizQuestionText"></h3>
+          <label for="quizProgressBar" class="quiz__question-label"
+            >Question 6 of 10</label
+          >
+          <h3
+            class="quiz__question-text"
+            id="quizQuestionText"
+            tabindex="-1"
+          ></h3>
           <progress
             max="10"
             value="0"
@@ -257,7 +266,7 @@
             60%
           </progress>
         </div>
-        <div class="quiz__answer">
+        <div class="quiz__answer" aria-describedby="quizQuestionText">
           <div class="quiz__options">
             <div class="quiz__option">
               <input
@@ -390,7 +399,7 @@
           <button type="button" class="quiz__submit-btn button">
             Submit Answer
           </button>
-          <div class="quiz__error-message hidden">
+          <div class="quiz__error-message hidden" role="alert" tabindex="-1">
             <img
               class="quiz__error-message-icon"
               src="./assets/images/icon-error.svg"

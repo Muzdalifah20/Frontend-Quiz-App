@@ -116,6 +116,7 @@
   --color-background-pattren-ellipse-dark: var(--c-blue-950);
   --color-toggle-icon-light: var(--c-grey-500);
   --color-toggle-icon-dark: var(--c-white);
+  --color-focus: var(--c-purple-600);
 
   /* System Default */
   --color-text-main: var(--color-text-main-light);
@@ -136,6 +137,7 @@
   --border-radius-24: 24px;
   --border-radius-12: 12px;
   --border-radius-8: 8px;
+  --outline: 3px solid var(--color-focus);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -177,8 +179,6 @@ body {
   font-size: var(--fs-18);
   line-height: var(--lh-18);
   padding-block-end: 87px;
-  transition: 500ms ease-in-out;
-  transition-property: color background;
   @media (width > calc(700 / 16 * 1rem)) {
     font-size: var(--fs-28);
     line-height: var(--lh-28);
@@ -234,6 +234,28 @@ button {
 .visually-hidden {
   position: absolute;
   left: -1000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+
+  &.skip-link:focus {
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: var(--color-main-bg);
+    color: var(--color-text-main);
+    padding: 10px;
+    border: 2px solid var(--color-focus);
+  }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--outline);
+  outline-offset: 3px;
 }
 
 .background-pattren-ellipse-mobile {
@@ -368,6 +390,11 @@ button {
   display: inline-block;
   opacity: 0;
   cursor: pointer;
+}
+
+.header__toggle-wrapper:has(input[type="radio"]:focus-visible) {
+  outline: var(--outline);
+  outline-offset: 3px;
 }
 
 .header__toggle-background {
@@ -577,6 +604,8 @@ button {
   @media (width > calc(1200 / 16 * 1rem)) {
     padding: 24px;
   }
+
+  cursor: pointer;
 }
 
 .quiz__option-radio-input {
@@ -607,6 +636,11 @@ button {
 
 .quiz__option:has(.quiz__option-radio-input:checked) {
   border: 2px solid var(--color-select-active);
+}
+
+.quiz__option:has(.quiz__option-radio-input:focus-visible) {
+  outline: var(--outline);
+  outline-offset: 3px;
 }
 
 .quiz__option-radio-input:checked
