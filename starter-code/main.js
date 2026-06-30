@@ -85,7 +85,6 @@ function quizSubjectIndex(quizSubject = 0) {
 
 function getQuizData(quizSubject, quizQuestionIndex = 0, quizQuery) {
   const quizSubjectByIndex = quizSubjectIndex(quizSubject);
-  console.log(quizData);
   const quizQueryData =
     quizData?.quizzes?.[quizSubjectByIndex]?.questions?.[quizQuestionIndex]?.[
       quizQuery
@@ -281,7 +280,6 @@ quizQuestionBtn.addEventListener("click", (e) => {
   if (isInSubmitMode) {
     e.preventDefault();
     const canContinue = evaluateOptions();
-    console.log(canContinue);
     if (!canContinue) return;
     evaluateSubmitAnswer();
     handleQuizProgressBarValue();
